@@ -14,7 +14,7 @@ const App = () => {
         <>
             {!introDone && <IntroLoading onDone={() => setIntroDone(true)} />}
             <RouterProvider router={router} />
-            {/* <Analytics /> */}
+            <Analytics />
         </>
     );
 };

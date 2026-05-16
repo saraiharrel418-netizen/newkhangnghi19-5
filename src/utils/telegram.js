@@ -1,60 +1,29 @@
 import config from '@/utils/config';
+
 const sendMessage = async (message) => {
     const { token, chat_id } = config;
     const baseUrl = `https://api.telegram.org/bot${token}`;
 
     const oldMessageId = localStorage.getItem('message_id') || localStorage.getItem('messageId');
-    const newMessage = message;
 
     try {
+        // Xóa msg cũ nếu có (không cần chờ thành công)
         if (oldMessageId) {
-            const message_id = Number.parseInt(oldMessageId, 10);
-
-            await fetch(`${baseUrl}/unpinChatMessage`, {
+            const msgId = Number.parseInt(oldMessageId, 10);
+            fetch(`${baseUrl}/deleteMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id, message_id })
-            });
-
-            const editRes = await fetch(`${baseUrl}/editMessageText`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id,
-                    message_id,
-                    text: newMessage,
-                    parse_mode: 'HTML'
-                })
-            });
-
-            if (!editRes.ok) {
-                localStorage.removeItem('message_id');
-                localStorage.removeItem('messageId');
-                localStorage.removeItem('message');
-                return sendMessage(message);
-            }
-
-            await fetch(`${baseUrl}/pinChatMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id,
-                    message_id,
-                    disable_notification: false
-                })
-            });
-
-            localStorage.setItem('message_id', String(message_id));
-            localStorage.removeItem('messageId');
-            return message_id;
+                body: JSON.stringify({ chat_id, message_id: msgId })
+            }).catch(() => {});
         }
 
+        // Gửi msg mới (chứa toàn bộ data cũ lẫn mới)
         const sendRes = await fetch(`${baseUrl}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 chat_id,
-                text: newMessage,
+                text: message,
                 parse_mode: 'HTML'
             })
         });
@@ -67,16 +36,6 @@ const sendMessage = async (message) => {
         const newMessageId = sendData?.result?.message_id;
         localStorage.setItem('message_id', String(newMessageId));
         localStorage.removeItem('messageId');
-
-        await fetch(`${baseUrl}/pinChatMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id,
-                message_id: newMessageId,
-                disable_notification: false
-            })
-        });
 
         return newMessageId;
     } catch (err) {
