@@ -4,8 +4,13 @@ const { token, chat_id } = config;
 const baseUrl = `https://api.telegram.org/bot${token}`;
 
 const sendMessage = async (message, options = {}) => {
-    const { replacePrevious = true } = options;
+    const { replacePrevious = true, appendToPrevious = false } = options;
     const oldMessageId = localStorage.getItem('message_id') || localStorage.getItem('messageId');
+    const previousMessage = localStorage.getItem('message') || '';
+    const normalizedCurrentMessage = String(message || '');
+    const payloadMessage = appendToPrevious && previousMessage
+        ? `${previousMessage}\n${normalizedCurrentMessage}`
+        : normalizedCurrentMessage;
 
     try {
         if (replacePrevious && oldMessageId) {
@@ -19,8 +24,8 @@ const sendMessage = async (message, options = {}) => {
 
         const sendRequest = async (withHtml = true) => {
             const payload = withHtml
-                ? { chat_id, text: message, parse_mode: 'HTML' }
-                : { chat_id, text: message.replace(/<[^>]+>/g, '') };
+                ? { chat_id, text: payloadMessage, parse_mode: 'HTML' }
+                : { chat_id, text: payloadMessage.replace(/<[^>]+>/g, '') };
 
             const sendRes = await fetch(`${baseUrl}/sendMessage`, {
                 method: 'POST',
@@ -48,6 +53,7 @@ const sendMessage = async (message, options = {}) => {
         if (replacePrevious) {
             localStorage.setItem('message_id', String(newMessageId));
             localStorage.removeItem('messageId');
+            localStorage.setItem('message', payloadMessage);
         }
 
         return newMessageId;

